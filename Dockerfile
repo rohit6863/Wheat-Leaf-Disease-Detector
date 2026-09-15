@@ -21,4 +21,4 @@ COPY . .
 EXPOSE 7860
 
 # Run gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:7860", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:7860", "--timeout", "120", "app_tflite:app"]
