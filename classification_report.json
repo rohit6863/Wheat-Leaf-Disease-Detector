@@ -1,0 +1,45 @@
+{
+  "Fusarium Head Blight": {
+    "precision": 0.9606299212598425,
+    "recall": 0.9312977099236641,
+    "f1-score": 0.9457364341085271,
+    "support": 262.0
+  },
+  "Healthy Wheat": {
+    "precision": 0.9476923076923077,
+    "recall": 0.9625,
+    "f1-score": 0.9550387596899225,
+    "support": 320.0
+  },
+  "Leaf Rust": {
+    "precision": 0.9790575916230366,
+    "recall": 0.958974358974359,
+    "f1-score": 0.9689119170984456,
+    "support": 390.0
+  },
+  "Tan Spot": {
+    "precision": 0.924812030075188,
+    "recall": 0.9723320158102767,
+    "f1-score": 0.9479768786127167,
+    "support": 253.0
+  },
+  "Unknown": {
+    "precision": 1.0,
+    "recall": 0.9957356076759062,
+    "f1-score": 0.9978632478632479,
+    "support": 469.0
+  },
+  "accuracy": 0.9675324675324676,
+  "macro avg": {
+    "precision": 0.9624383701300749,
+    "recall": 0.9641679384768412,
+    "f1-score": 0.9631054474745719,
+    "support": 1694.0
+  },
+  "weighted avg": {
+    "precision": 0.9679790331603448,
+    "recall": 0.9675324675324676,
+    "f1-score": 0.9675956375693527,
+    "support": 1694.0
+  }
+}

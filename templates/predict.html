@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Predict Wheat Leaf Disease</title>
+  <style>
+    :root {
+      --primary-green: #2e8b57;
+      --primary-green-dark: #1e6f46;
+      --light-bg: #f0fff0;
+      --card-bg: #ffffff;
+      --result-bg: #ecf0f1;
+      --text-dark: #333;
+      --button-hover-scale: 1.05;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 24px;
+      margin: 0;
+      color: var(--text-dark);
+      overflow: hidden; 
+
+      
+      background-image: var(--bg-url);
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+    }
+
+    
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.6);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      background: rgba(255,255,255,0.92);
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 900px;
+      margin: auto;
+      transition: all 0.3s ease-in-out;
+      max-height: calc(100vh - 48px);
+      overflow: auto; 
+    }
+
+    h1 {
+      color: var(--primary-green);
+      font-size: 28px;
+      margin-bottom: 16px;
+      font-weight: bold;
+    }
+
+    input[type="file"] {
+      margin-top: 20px;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background-color: var(--light-bg);
+      transition: background-color 0.3s ease;
+    }
+
+    input[type="file"]:hover {
+      background-color: #e6f7f2;
+    }
+
+    .button-group {
+      margin-top: 25px;
+    }
+
+    input[type="submit"] {
+      background-color: var(--primary-green);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      margin-top: 20px;
+    }
+
+    input[type="submit"]:hover {
+      background-color: var(--primary-green-dark);
+      transform: scale(var(--button-hover-scale));
+    }
+
+    .preview-img {
+      margin-top: 16px;
+      max-width: 100%;
+      max-height: 32vh; /* keep images within viewport */
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      display: none;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .preview-img:hover {
+      transform: scale(1.02);
+    }
+
+    .result {
+      margin-top: 20px;
+      background-color: var(--result-bg);
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .result h2 {
+      color: var(--primary-green);
+      font-size: 22px;
+      margin: 0 0 8px 0;
+    }
+
+    .result p {
+      font-size: 16px;
+      margin: 6px 0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+  </style>
+</head>
+<body style="--bg-url: url('{{ url_for('static', filename='wheat_background.jpeg') }}')">
+  <div class="container">
+    <h1>🌾 Upload Wheat Leaf Image</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+      <input type="file" name="file" id="fileInput" accept="image/*" onchange="previewImage(event)" required><br>
+
+      <div class="button-group">
+        <input type="submit" value="🔍 Predict">
+      </div>
+    </form>
+
+    <img id="preview" class="preview-img" src="#" alt="Image Preview">
+
+    {% if label %}
+    <div class="result">
+      <h2>🧪 Prediction: <strong>{{ label }}</strong></h2>
+      <p>Model Confidence: <strong>{{ "%.2f"|format(confidence) }}%</strong></p>
+      <img src="{{ url_for('static', filename='last_uploaded.jpg') }}?{{ random() }}" class="preview-img" style="display:block;">
+      {% if label == 'Unknown' %}
+        <p style="color: #e67e22; font-weight: bold;">❓ This image doesn't appear to be a wheat leaf. Please upload a clear wheat leaf image.</p>
+      {% elif confidence > 80 %}
+        <p style="color: #27ae60; font-weight: bold;">✅ High Confidence Prediction</p>
+      {% elif confidence > 60 %}
+        <p style="color: #f39c12; font-weight: bold;">⚠️ Medium Confidence Prediction</p>
+      {% else %}
+        <p style="color: #e74c3c; font-weight: bold;">❌ Low Confidence Prediction - Please try with a clearer image</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <script>
+    function previewImage(event) {
+      const preview = document.getElementById('preview');
+      preview.src = URL.createObjectURL(event.target.files[0]);
+      preview.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wheat Leaf Disease Detector</title>
+  <style>
+    :root {
+      --primary-green: #2e8b57;
+      --primary-green-dark: #1e6f46;
+      --light-bg: #f0fff0;
+      --light-surface: #ffffff;
+      --card-bg: #f9fff9;
+      --text-dark: #333333;
+      --text-muted: #555555;
+      --accent: #36b67d;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 40px 30px; /* allow page scroll to view larger images */
+      color: var(--text-dark);
+      font-size: 18px; /* larger base font size */
+      overflow-y: auto; /* enable page scroll */
+
+      
+      background-image: url('{{ url_for('static', filename='wheat_background.jpeg') }}');
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+    }
+
+    /* Subtle overlay to keep text readable over the background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.6);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1400px; /* wider for horizontal layout screenshots */
+      margin: auto;
+      background: rgba(255,255,255,0.9);
+      padding: 48px; /* slightly smaller to fit on one screen */
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .title-glass {
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 20px 30px;
+      width: fit-content;
+      max-width: 95%;
+      margin: 0 auto 40px auto;
+      text-align: center;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+      animation: floatHeader 5s ease-in-out infinite;
+    }
+
+    .title-glass h1 {
+      font-size: 36px; /* reduced heading size */
+      color: var(--primary-green);
+      text-shadow: 1px 1px 8px rgba(46, 139, 87, 0.2);
+    }
+
+    @keyframes floatHeader {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .cards {
+      display: flex;
+      flex-wrap: nowrap;   /* single horizontal row */
+      gap: 28px;           /* slightly reduced to fit */
+      justify-content: flex-start;
+      margin-top: 30px;
+      overflow-x: auto;    /* allow scroll if screen is smaller */
+      padding-bottom: 8px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+      width: 320px;    /* larger to showcase single image */
+      padding: 24px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 28px rgba(0, 128, 0, 0.15);
+    }
+
+    .card img {
+      width: 100%;
+      height: 220px; /* larger single image */
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .card img:hover {
+      transform: scale(1.05);
+    }
+
+    .card h3 {
+      color: var(--primary-green);
+      margin: 12px 0 8px;
+      font-size: 22px;
+    }
+
+    .card p {
+      font-size: 18px; /* larger text */
+      color: var(--text-muted);
+    }
+
+    /* Removed thumbnail strips; showing larger main images instead */
+
+    .container p { font-size: 20px; } /* increase body text size */
+
+    .button {
+      margin-top: 48px;
+      text-align: center;
+    }
+
+    a.button-link {
+      display: inline-block;
+      padding: 14px 28px;
+      background-color: var(--primary-green);
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+      margin: 10px;
+    }
+
+    a.button-link:hover {
+      background-color: var(--primary-green-dark);
+    }
+
+    #topBtn {
+      display: none;
+      position: fixed;
+      bottom: 40px;
+      right: 30px;
+      z-index: 99;
+      font-size: 18px;
+      border: none;
+      background-color: var(--primary-green);
+      color: white;
+      cursor: pointer;
+      padding: 12px 16px;
+      border-radius: 50%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    #topBtn:hover {
+      background-color: var(--primary-green-dark);
+    }
+
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 56px;           /* increased spacing */
+      width: 70%;
+      margin: 8% auto;
+      border-radius: 12px;
+      color: var(--text-dark);
+      position: relative;
+      font-size: 22px;         /* larger modal text */
+      line-height: 1.6;
+    }
+
+    .modal-content h2 {
+      color: var(--primary-green);
+    }
+
+    .close {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      cursor: pointer;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="title-glass">
+    <h1>🌾 Wheat Leaf Disease Detector</h1>
+  </div>
+
+  <div class="container">
+    <p>
+      Wheat is one of the most important staple crops worldwide. Diseases in wheat leaves significantly reduce yield and affect food security. 
+      This AI-powered tool helps detect common wheat leaf diseases using deep learning techniques. Just upload an image, and our model will classify it.
+    </p>
+
+    <div class="button">
+      <a href="{{ url_for('predict') }}" class="button-link">Go to Prediction Page</a>
+      <a href="#" class="button-link" onclick="document.getElementById('modal').style.display='block'">About This Project</a>
+    </div>
+    <h2 style="color: var(--text-dark);">Diseases Detected</h2>
+    <div class="cards">
+      <div class="card">
+        <img src="{{ url_for('static', filename='fusarium_1.jpg') }}" alt="Fusarium Head Blight" onerror="this.style.display='none'">
+        <h3>Fusarium Head Blight</h3>
+        <p>Also known as scab, causes bleached spikelets and shriveled grains. Major threat to wheat yield.</p>
+        
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='healthy_1.jpg') }}" alt="Healthy Wheat" onerror="this.style.display='none'">
+        <h3>Healthy Wheat</h3>
+        <p>No visible disease; vibrant green leaves with no deformities, spots, or discoloration.</p>
+        
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='leaf_rust_1.jpg') }}" alt="Leaf Rust" onerror="this.style.display='none'">
+        <h3>Leaf Rust</h3>
+        <p>Caused by <i>Puccinia triticina</i>, appears as small orange-brown pustules on leaf surfaces.</p>
+        
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='tan_spot_1.jpg') }}" alt="Tan Spot" onerror="this.style.display='none'">
+        <h3>Tan Spot</h3>
+        <p>Fungal disease causing tan to brown spots with yellow halos on wheat leaves.</p>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('modal').style.display='none'">&times;</span>
+      <h2>About the Wheat Leaf Disease Detector</h2>
+      <p>This tool helps farmers and researchers identify wheat leaf diseases using an AI model trained with ResNet50. Just upload a photo to detect issues like Fusarium Head Blight, Leaf Rust, Tan Spot, or confirm a healthy wheat leaf. The model provides high accuracy predictions to help with early disease detection and crop management.</p>
+    </div>
+  </div>
+
+    
+
+
+  <!-- Scroll to Top -->
+  <button onclick="topFunction()" id="topBtn" title="Go to top">↑</button>
+
+  <script>
+    // Scroll to top
+    let topBtn = document.getElementById("topBtn");
+    window.onscroll = function () {
+      topBtn.style.display = (document.documentElement.scrollTop > 200) ? "block" : "none";
+    };
+    function topFunction() {
+      document.documentElement.scrollTop = 0;
+    }
+  </script>
+</body>
+</html>
