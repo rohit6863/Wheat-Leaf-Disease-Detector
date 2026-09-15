@@ -20,5 +20,5 @@ COPY . .
 # We can tell gunicorn to bind to 0.0.0.0:7860)
 EXPOSE 7860
 
-# Run gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:7860", "--timeout", "120", "app_tflite:app"]
+# Run gunicorn (Listen on PORT env variable provided by Render/Koyeb)
+CMD gunicorn -b 0.0.0.0:${PORT:-10000} --timeout 120 app_tflite:app
